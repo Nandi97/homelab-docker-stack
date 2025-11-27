@@ -1,0 +1,23 @@
+services:
+  dashy:
+    image: lissy93/dashy:latest
+    container_name: dashy
+    ports:
+      # Change 8080 on the left if something else will use it
+      - "8080:8080"
+    environment:
+      - NODE_ENV=production
+      - UID=1000       # <-- replace with your uid if different
+      - GID=1000       # <-- replace with your gid if different
+    volumes:
+      # Main config file (create this on the host)
+      - /srv/docker/data/dashy/conf.yml:/app/user-data/conf.yml
+      # Optional: persistent app data (themes, etc.)
+      - /srv/docker/data/dashy/data:/app/user-data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "node", "/app/services/healthcheck"]
+      interval: 90s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
