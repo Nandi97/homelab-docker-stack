@@ -1,0 +1,32 @@
+version: "3.8"
+
+services:
+  stirling-pdf:
+    image: stirlingtools/stirling-pdf:latest
+    container_name: stirling-pdf
+    ports:
+      # Access Stirling at: http://YOUR_VPS_IP:8090
+      - "8090:8080"
+    volumes:
+      # Persistent data locations
+      - /srv/docker/data/stirling-pdf/tessdata:/usr/share/tessdata
+      - /srv/docker/data/stirling-pdf/configs:/configs
+      - /srv/docker/data/stirling-pdf/logs:/logs
+      - /srv/docker/data/stirling-pdf/pipeline:/pipeline
+    environment:
+      # Run both frontend + backend in one container
+      - MODE=BOTH
+
+      # Enable security build + login support
+      - DOCKER_ENABLE_SECURITY=true
+      - SECURITY_ENABLELOGIN=true
+
+      # Initial login (you can change after first login)
+      - SECURITY_INITIALLOGIN_USERNAME=admin
+      - SECURITY_INITIALLOGIN_PASSWORD=stirling
+
+      # UI language & timezone
+      - LANGS=en_GB
+      - TZ=America/Toronto
+    restart: unless-stopped
+
