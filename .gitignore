@@ -2,3 +2,6 @@ data/
 *.log
 *.env
 *.env.global
+
+config.yml
+conf.yml

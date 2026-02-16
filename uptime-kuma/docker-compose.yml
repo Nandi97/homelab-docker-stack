@@ -1,25 +1,23 @@
-version: "3.8"
+version: "3.9"
 
 services:
   uptime-kuma:
     image: louislam/uptime-kuma:latest
     container_name: uptime-kuma
-    restart: always
-    ports:
-      - "3001:3001"  # host:container
+    restart: unless-stopped
+    environment:
+      - TZ=America/Toronto
+      - UMASK=0022
     volumes:
       - /srv/docker/data/uptime-kuma:/app/data
-    environment:
-      - TZ=America/Toronto      # your local time
-      - UMASK=0022
     networks:
-      - kuma_network
+      - caddy_net
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:3001"]
+      test: ["CMD-SHELL", "wget -qO- http://localhost:3001 >/dev/null 2>&1 || exit 1"]
       interval: 30s
-      retries: 3
-      start_period: 10s
       timeout: 5s
+      retries: 3
+      start_period: 20s
     logging:
       driver: "json-file"
       options:
@@ -27,5 +25,5 @@ services:
         max-file: "3"
 
 networks:
-  kuma_network:
-    driver: bridge
+  caddy_net:
+    external: true

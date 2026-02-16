@@ -1,34 +1,44 @@
 version: "3.8"
 
 services:
-  mongo:
-    image: mongo:latest
-    container_name: mongo
-    restart: always
+  # Postgres backend for FerretDB
+  ferret-postgres:
+    image: ghcr.io/ferretdb/postgres-documentdb:17-0.107.0-ferretdb-2.7.0
+    container_name: ferretdb-postgres
+    restart: unless-stopped
     environment:
-      MONGO_INITDB_ROOT_USERNAME: root
-      MONGO_INITDB_ROOT_PASSWORD: alvinkigen97!
+      POSTGRES_USER: ferret
+      POSTGRES_PASSWORD: ferretpass123
+      POSTGRES_DB: ferret
     volumes:
-      - /srv/docker/data/mongo/db:/data/db
-    networks:
-      - mongo_network
+      - /srv/docker/data/mongo/postgres:/var/lib/postgresql/data
 
-  mongo-express:
-    image: mongo-express:latest
-    container_name: mongo-express
-    restart: always
-    ports:
-      - "8092:8081"   # Access at http://YOUR_VPS_IP:8092
-    environment:
-      ME_CONFIG_MONGODB_URL: mongodb://root:alvinkigen97!@mongo:27017/
-      ME_CONFIG_BASICAUTH_ENABLED: "true"
-      ME_CONFIG_BASICAUTH_USERNAME: mongoexpressuser
-      ME_CONFIG_BASICAUTH_PASSWORD: mongoexpresspass
+  # MongoDB-compatible server
+  ferretdb:
+    image: ghcr.io/ferretdb/ferretdb:2.7.0
+    container_name: ferretdb
+    restart: unless-stopped
     depends_on:
-      - mongo
-    networks:
-      - mongo_network
+      - ferret-postgres
+    ports:
+      - "27017:27017"          # Mongo-compatible endpoint for apps: mongodb://HOST:27017
+    environment:
+      FERRETDB_POSTGRESQL_URL: postgres://ferret:ferretpass123@ferretdb-postgres:5432/ferret
+      FERRETDB_TELEMETRY: disable
+
+  # Web UI (Mongo-like frontend)
+  studio:
+    image: ghcr.io/ferretdb/studio:latest
+    container_name: ferretdb-studio
+    restart: unless-stopped
+    depends_on:
+      - ferretdb
+    ports:
+      - "8093:8080"            # http://157.180.37.52:8093
+    environment:
+      # If you enable auth in FerretDB later, update this URI with credentials
+      MONGO_URI: mongodb://ferretdb:27017
 
 networks:
-  mongo_network:
-    driver: bridge
+  default:
+    name: ferretdb

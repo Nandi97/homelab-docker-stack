@@ -1,0 +1,51 @@
+{
+	# Optional: email for ACME cert notifications
+	# email you@kigtech.digital
+
+	# Optional: stronger defaults
+	servers {
+		protocols h1 h2 h3
+	}
+}
+
+# --- 0) IP access (HTTP only) ---
+:80 {
+	root * /srv
+	file_server
+}
+
+# --- 1) Dashy (your main portal) ---
+dash.kigtech.digital {
+	encode zstd gzip
+	reverse_proxy dashy:8080
+}
+
+# --- 2) Uptime Kuma ---
+status.kigtech.digital {
+  encode zstd gzip
+  reverse_proxy uptime-kuma:3001
+}
+
+# --- 3) Portainer ---
+portainer.kigtech.digital {
+  encode zstd gzip
+  reverse_proxy portainer:9000
+}
+
+# --- 4) Paperless ---
+paperless.kigtech.digital {
+  encode zstd gzip
+  reverse_proxy paperless:8000
+}
+
+# --- 5) Stirling PDF ---
+pdf.kigtech.digital {
+  encode zstd gzip
+  reverse_proxy stirling-pdf:8080
+}
+
+# --- 6) PG Admin ---
+pg.kigtech.digital {
+  encode zstd gzip
+  reverse_proxy dev-pgadmin:80
+}

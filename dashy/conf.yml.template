@@ -1,0 +1,100 @@
+pageInfo:
+  title: KIGTech Dashboard
+  description: VPS Services & Infrastructure
+
+appConfig:
+  theme: dark
+  layout: auto
+  iconSize: medium
+  language: en
+  auth: false
+  searchEngine: internal
+  showStats: true
+
+sections:
+  - name: Core Services
+    icon: fas fa-th-large
+    items:
+      - title: Dashy
+        url: https://dash.kigtech.digital
+        icon: fas fa-home
+        description: Main dashboard
+        statusCheck: true
+        statusCheckUrl: https://dash.kigtech.digital
+
+      - title: Portainer
+        url: https://portainer.kigtech.digital
+        icon: fab fa-docker
+        description: Docker container & stack management
+        statusCheck: true
+        statusCheckUrl: https://portainer.kigtech.digital
+
+  - name: Monitoring
+    icon: fas fa-heartbeat
+    items:
+      - title: Uptime Kuma
+        url: ${UPTIME_KUMA_URL}
+        icon: fas fa-heartbeat
+        description: Uptime & endpoint monitoring
+        statusCheck: true
+        statusCheckUrl: ${UPTIME_KUMA_URL}
+    widgets:
+      - type: uptime-kuma
+        options:
+          url: ${UPTIME_KUMA_URL}
+          apiKey: ${UPTIME_KUMA_API_KEY}
+
+  - name: Documents & Tools
+    icon: fas fa-tools
+    items:
+      - title: Paperless-ngx
+        url: https://paperless.kigtech.digital
+        icon: fas fa-file-invoice
+        description: Document management system
+        statusCheck: true
+        statusCheckUrl: https://paperless.kigtech.digital
+
+      - title: Stirling PDF
+        url: https://pdf.kigtech.digital
+        icon: fas fa-file-pdf
+        description: Self-hosted PDF toolkit
+        # Stirling returns 401 when login is enabled; that still means it's alive.
+        # Dashy statusCheck may mark 401 as down depending on version; if it annoys you, set statusCheck: false
+        statusCheck: true
+        statusCheckUrl: https://pdf.kigtech.digital
+
+  - name: Dev Databases
+    icon: fas fa-database
+    items:
+      - title: pgAdmin
+        url: https://pg.kigtech.digital
+        icon: fas fa-database
+        description: PostgreSQL administration
+        target: newtab
+        statusCheck: true
+        statusCheckUrl: https://pg.kigtech.digital
+
+  - name: System Info
+    icon: fas fa-info-circle
+    widgets:
+      - type: clock
+        options:
+          timezone: ${TZ}
+          format: HH:mm:ss
+          hideDate: false
+
+      - type: weather
+        options:
+          apiKey: ${OPENWEATHER_API_KEY}
+          city: ${WEATHER_CITY}
+          units: ${WEATHER_UNITS}
+          hideDetails: true
+
+      - type: system-info
+
+  - name: Crypto
+    icon: fab fa-github
+    widgets:
+      - type: crypto-watch-list
+        options:
+          limit: 10

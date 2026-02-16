@@ -19,6 +19,9 @@ services:
     restart: always
     healthcheck:
       disable: false
+    networks:
+      - default
+      - caddy_net
 
   immich-machine-learning:
     container_name: immich_machine_learning
@@ -54,3 +57,7 @@ services:
 
 volumes:
   model-cache:
+  
+networks:
+  caddy_net:
+    external: true

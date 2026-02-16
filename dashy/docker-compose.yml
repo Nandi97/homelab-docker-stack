@@ -1,23 +1,44 @@
+version: "3.9"
+
 services:
+  dashy-render:
+    image: alpine:3.19
+    container_name: dashy-render
+    restart: "no"
+    env_file:
+      - ./.env
+    volumes:
+      - /srv/docker/dashy/conf.yml.template:/tmp/conf.yml.template:ro
+      - /srv/docker/dashy:/out
+    command: >
+      sh -lc "
+        apk add --no-cache gettext >/dev/null 2>&1 &&
+        envsubst < /tmp/conf.yml.template > /out/conf.yml
+      "
+
   dashy:
     image: lissy93/dashy:latest
     container_name: dashy
-    ports:
-      # Change 8080 on the left if something else will use it
-      - "8080:8080"
+    restart: unless-stopped
+    depends_on:
+      dashy-render:
+        condition: service_completed_successfully
     environment:
       - NODE_ENV=production
-      - UID=1000       # <-- replace with your uid if different
-      - GID=1000       # <-- replace with your gid if different
+      - UID=1000
+      - GID=1000
     volumes:
-      # Main config file (create this on the host)
-      - /srv/docker/data/dashy/conf.yml:/app/user-data/conf.yml
-      # Optional: persistent app data (themes, etc.)
+      - /srv/docker/dashy/conf.yml:/app/user-data/conf.yml:ro
       - /srv/docker/data/dashy/data:/app/user-data
-    restart: unless-stopped
+    networks:
+      - caddy_net
     healthcheck:
       test: ["CMD", "node", "/app/services/healthcheck"]
       interval: 90s
       timeout: 10s
       retries: 3
       start_period: 40s
+
+networks:
+  caddy_net:
+    external: true

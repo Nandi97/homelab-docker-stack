@@ -1,32 +1,36 @@
-version: "3.8"
+version: "3.9"
 
 services:
   stirling-pdf:
-    image: stirlingtools/stirling-pdf:latest
+    image: stirlingtools/stirling-pdf:2.1.4
     container_name: stirling-pdf
-    ports:
-      # Access Stirling at: http://YOUR_VPS_IP:8090
-      - "8090:8080"
-    volumes:
-      # Persistent data locations
-      - /srv/docker/data/stirling-pdf/tessdata:/usr/share/tessdata
-      - /srv/docker/data/stirling-pdf/configs:/configs
-      - /srv/docker/data/stirling-pdf/logs:/logs
-      - /srv/docker/data/stirling-pdf/pipeline:/pipeline
-    environment:
-      # Run both frontend + backend in one container
-      - MODE=BOTH
-
-      # Enable security build + login support
-      - DOCKER_ENABLE_SECURITY=true
-      - SECURITY_ENABLELOGIN=true
-
-      # Initial login (you can change after first login)
-      - SECURITY_INITIALLOGIN_USERNAME=admin
-      - SECURITY_INITIALLOGIN_PASSWORD=stirling
-
-      # UI language & timezone
-      - LANGS=en_GB
-      - TZ=America/Toronto
     restart: unless-stopped
 
+    env_file:
+      - ./.env
+
+    environment:
+      - DOCKER_ENABLE_SECURITY=true
+      - SECURITY_ENABLE_LOGIN=true
+      - CSRF_DISABLED=false
+      - DEFAULT_LOCALE=en-US
+      - INSTALL_BOOK_AND_ADVANCED_HTML_OPS=false
+      - LANGS=en_US
+
+    volumes:
+      - /srv/docker/data/stirling-pdf/tessdata:/usr/share/tessdata
+      - /srv/docker/data/stirling-pdf/configs:/configs
+
+    networks:
+      - caddy_net
+
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8080 >/dev/null 2>&1 || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+networks:
+  caddy_net:
+    external: true

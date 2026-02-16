@@ -1,0 +1,60 @@
+version: "3.8"
+
+services:
+  vaultwarden:
+    container_name: vaultwarden
+    image: vaultwarden/server:latest
+    restart: unless-stopped
+
+    # Only internal exposure; Caddy will reverse proxy it
+    expose:
+      - "80"
+
+    volumes:
+      - /srv/docker/data/vaultwarden:/data
+
+    environment:
+      # Public URL for Vaultwarden (change if you want a different host)
+      DOMAIN: "https://vault.dev.kigtech.digital"
+
+      # Recommended for browser/mobile clients
+      WEBSOCKET_ENABLED: "true"
+
+      # Rate limiting (tweak as you like)
+      LOGIN_RATELIMIT_MAX_BURST: "10"
+      LOGIN_RATELIMIT_SECONDS: "60"
+      ADMIN_RATELIMIT_MAX_BURST: "10"
+      ADMIN_RATELIMIT_SECONDS: "60"
+
+      # Admin panel (generate a strong token!)
+      ADMIN_TOKEN: "CHANGE_ME_TO_A_REALLY_STRONG_TOKEN"
+
+      # Features
+      SENDS_ALLOWED: "true"
+      EMERGENCY_ACCESS_ALLOWED: "true"
+      WEB_VAULT_ENABLED: "true"
+
+      # Signup controls – good defaults for your personal use
+      SIGNUPS_ALLOWED: "true"         # don't allow public signups
+      SIGNUPS_VERIFY: "true"
+      SIGNUPS_VERIFY_RESEND_TIME: "3600"
+      SIGNUPS_VERIFY_RESEND_LIMIT: "5"
+      # SIGNUPS_DOMAINS_WHITELIST: "kigtech.digital"
+
+      # SMTP – fill these with your real mail provider details
+      SMTP_HOST: "smtp.gmail.com"
+      SMTP_FROM: "cartezalvin@gmail.com"
+      SMTP_FROM_NAME: "Vaultwarden"
+      SMTP_SECURITY: "starttls"        # or "force_tls" / "off"
+      SMTP_PORT: "587"
+      SMTP_USERNAME: "cartezalvin@gmail.com"
+      SMTP_PASSWORD: "ktag afpq wwqp nteu"
+      SMTP_AUTH_MECHANISM: "plain"     # or "login" / "cram-md5"
+
+    networks:
+      - web
+
+networks:
+  web:
+    external: true
+  

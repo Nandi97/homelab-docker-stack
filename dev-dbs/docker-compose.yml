@@ -1,0 +1,74 @@
+version: "3.9"
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: dev-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${DEV_PG_USER}
+      POSTGRES_PASSWORD: ${DEV_PG_PASSWORD}
+      POSTGRES_DB: ${DEV_PG_DB}
+    volumes:
+      - /srv/docker/data/dev-postgres:/var/lib/postgresql/data
+    networks:
+      - dev_dbs
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DEV_PG_USER} -d ${DEV_PG_DB} || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: dev-redis
+    restart: unless-stopped
+    # Redis secured:
+    # - bind to all interfaces inside docker (fine)
+    # - require password
+    # - protected-mode yes (default)
+    # - appendonly for durability
+    command:
+      [
+        "redis-server",
+        "--appendonly", "yes",
+        "--requirepass", "${DEV_REDIS_PASSWORD}",
+        "--maxmemory-policy", "allkeys-lru"
+      ]
+    volumes:
+      - /srv/docker/data/dev-redis:/data
+    networks:
+      - dev_dbs
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli -a \"$${DEV_REDIS_PASSWORD}\" ping | grep -q PONG"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: dev-pgadmin
+    restart: unless-stopped
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD}
+      PGADMIN_CONFIG_SERVER_MODE: "True"
+    volumes:
+      - /srv/docker/data/dev-pgadmin:/var/lib/pgadmin
+    networks:
+      - dev_dbs
+      - caddy_net
+    depends_on:
+      - postgres
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:80 >/dev/null 2>&1 || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+
+networks:
+  dev_dbs:
+    driver: bridge
+  caddy_net:
+    external: true

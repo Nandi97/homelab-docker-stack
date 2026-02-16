@@ -1,0 +1,30 @@
+version: "3.9"
+
+services:
+  caddy:
+    image: caddy:2
+    container_name: caddy
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    volumes:
+      # Caddyfile + any snippet configs
+      - ./conf:/etc/caddy:ro
+      # optional static site content
+      - ./site:/srv:ro
+      # persistent certs + config
+      - /srv/docker/data/caddy_data:/data
+      - /srv/docker/data/caddy_config:/config
+    networks:
+      - web
+      - caddy_net
+
+networks:
+  web:
+    external: true
+  caddy_net:
+    external: true

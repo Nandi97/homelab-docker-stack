@@ -1,17 +1,20 @@
+version: "3.9"
+
 services:
   portainer:
     image: portainer/portainer-ce:latest
     container_name: portainer
-    restart: always
-    ports:
-      - "9000:9000"
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
+      - /var/run/docker.sock:/var/run/docker.sock:ro
       - /srv/docker/data/portainer:/data
     env_file:
-      - ../.env.global   # optional, if you're using it
+      - ../.env.global
+    networks:
+      - caddy_net
 
 networks:
-  default:
-    name: core
-    external: false
+  caddy_net:
+    external: true
