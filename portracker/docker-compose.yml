@@ -1,0 +1,58 @@
+version: "3.9"
+
+services:
+  docker-proxy:
+    image: tecnativa/docker-socket-proxy:latest
+    container_name: portracker-docker-proxy
+    restart: unless-stopped
+    environment:
+      - CONTAINERS=1
+      - IMAGES=1
+      - INFO=1
+      - NETWORKS=1
+      - SERVICES=1
+      - TASKS=1
+      - EVENTS=1
+      - POST=0
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    networks:
+      - portracker_net
+    # ✅ no ports: do NOT expose 2375 to the host
+
+  portracker:
+    image: mostafawahied/portracker:latest
+    container_name: portracker
+    restart: unless-stopped
+
+    # ✅ persistent data on your standard path
+    volumes:
+      - /srv/docker/data/portracker:/data
+
+    environment:
+      - DOCKER_HOST=tcp://docker-proxy:2375
+
+    depends_on:
+      - docker-proxy
+
+    networks:
+      - portracker_net
+      - caddy_net
+
+    # ✅ internal-only (Caddy will reverse_proxy it)
+    # no ports:
+
+    # ---- OPTIONAL (ONLY if Portracker fails without it) ----
+    # pid: "host"
+    # cap_add:
+    #   - SYS_PTRACE
+    #   - SYS_ADMIN
+    # security_opt:
+    #   - apparmor:unconfined
+    # --------------------------------------------------------
+
+networks:
+  portracker_net:
+    driver: bridge
+  caddy_net:
+    external: true

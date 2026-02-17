@@ -49,3 +49,9 @@ pg.kigtech.digital {
   encode zstd gzip
   reverse_proxy dev-pgadmin:80
 }
+
+# --- 6) Port Tracker ---
+portracker.kigtech.digital {
+  encode zstd gzip
+  reverse_proxy portracker:4999
+}

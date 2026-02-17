@@ -98,3 +98,10 @@ sections:
       - type: crypto-watch-list
         options:
           limit: 10
+
+  - title: Portracker
+    url: https://portracker.kigtech.digital
+    icon: fas fa-network-wired
+    description: Port / service visibility & tracking
+    statusCheck: true
+    statusCheckUrl: https://portracker.kigtech.digital
