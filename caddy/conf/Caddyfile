@@ -55,3 +55,9 @@ portracker.kigtech.digital {
   encode zstd gzip
   reverse_proxy portracker:4999
 }
+
+# --- 6) Fresh RSS ---
+rss.kigtech.digital {
+  encode zstd gzip
+  reverse_proxy freshrss:80
+}

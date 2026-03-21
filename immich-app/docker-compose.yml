@@ -12,7 +12,8 @@ services:
       - .env
       - ../.env.global
     ports:
-      - "2283:2283"
+      # Keep direct host access local-only; publish via Caddy if you want public access.
+      - "127.0.0.1:2283:2283"
     depends_on:
       - redis
       - database

@@ -6,7 +6,8 @@ services:
     container_name: netdata
     restart: unless-stopped
     ports:
-      - "19999:19999"   # Access Netdata at http://YOUR_VPS_IP:19999
+      # Keep host access local-only unless you intentionally expose this via a proxy/VPN.
+      - "127.0.0.1:19999:19999"
     cap_add:
       - SYS_PTRACE
     security_opt:

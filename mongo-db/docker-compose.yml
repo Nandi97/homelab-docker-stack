@@ -21,7 +21,8 @@ services:
     depends_on:
       - ferret-postgres
     ports:
-      - "27017:27017"          # Mongo-compatible endpoint for apps: mongodb://HOST:27017
+      # Keep database access local-only on the host.
+      - "127.0.0.1:27017:27017"
     environment:
       FERRETDB_POSTGRESQL_URL: postgres://ferret:ferretpass123@ferretdb-postgres:5432/ferret
       FERRETDB_TELEMETRY: disable
@@ -34,7 +35,8 @@ services:
     depends_on:
       - ferretdb
     ports:
-      - "8093:8080"            # http://157.180.37.52:8093
+      # Keep the admin UI local-only unless you intentionally proxy it.
+      - "127.0.0.1:8093:8080"
     environment:
       # If you enable auth in FerretDB later, update this URI with credentials
       MONGO_URI: mongodb://ferretdb:27017

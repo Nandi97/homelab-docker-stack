@@ -11,6 +11,8 @@ services:
       POSTGRES_DB: ${DEV_PG_DB}
     volumes:
       - /srv/docker/data/dev-postgres:/var/lib/postgresql/data
+    ports:
+      - "127.0.0.1:5432:5432"
     networks:
       - dev_dbs
     healthcheck:
@@ -19,31 +21,7 @@ services:
       timeout: 5s
       retries: 5
 
-  redis:
-    image: redis:7-alpine
-    container_name: dev-redis
-    restart: unless-stopped
-    # Redis secured:
-    # - bind to all interfaces inside docker (fine)
-    # - require password
-    # - protected-mode yes (default)
-    # - appendonly for durability
-    command:
-      [
-        "redis-server",
-        "--appendonly", "yes",
-        "--requirepass", "${DEV_REDIS_PASSWORD}",
-        "--maxmemory-policy", "allkeys-lru"
-      ]
-    volumes:
-      - /srv/docker/data/dev-redis:/data
-    networks:
-      - dev_dbs
-    healthcheck:
-      test: ["CMD-SHELL", "redis-cli -a \"$${DEV_REDIS_PASSWORD}\" ping | grep -q PONG"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
+  # redis: disabled for now
 
   pgadmin:
     image: dpage/pgadmin4:latest
