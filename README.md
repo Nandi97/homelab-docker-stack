@@ -96,6 +96,24 @@ docker version
 docker compose version
 ```
 
+## ✅ Compose Linting
+
+This repo includes a lightweight lint workflow for Compose files:
+
+- YAML checks with `yamllint`
+- Compose validation with `docker compose config`
+
+Run it from `/srv/docker`:
+
+```bash
+bash scripts/lint-compose.sh
+make lint-compose
+```
+
+If `yamllint` or `docker` is not installed, that step is skipped with a message.
+
+On a brand new VPS, install Docker first before expecting the Compose validation step to run.
+
 ---
 
 ## 🌐 Docker Networking Model
