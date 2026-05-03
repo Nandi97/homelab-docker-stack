@@ -1,10 +1,10 @@
 pageInfo:
-  title: KIGTech Dashboard
-  description: VPS Services & Infrastructure
+  title: KIGTech Ops Deck
+  description: Private control surface for the KIGTech VPS
 
 appConfig:
   theme: dark
-  layout: auto
+  layout: horizontal
   iconSize: medium
   language: en
   auth: false
@@ -12,30 +12,37 @@ appConfig:
   showStats: true
 
 sections:
-  - name: Core Services
-    icon: fas fa-th-large
+  - name: Control Plane
+    icon: fas fa-satellite-dish
     items:
-      - title: Dashy
-        url: https://dash.kigtech.digital
-        icon: fas fa-home
-        description: Main dashboard
-        statusCheck: true
-        statusCheckUrl: https://dash.kigtech.digital
-
       - title: Portainer
         url: https://portainer.kigtech.digital
         icon: fab fa-docker
-        description: Docker container & stack management
+        description: Stack control, containers, volumes, and updates
         statusCheck: true
         statusCheckUrl: https://portainer.kigtech.digital
 
-  - name: Monitoring
-    icon: fas fa-heartbeat
+      - title: Portracker
+        url: https://portracker.kigtech.digital
+        icon: fas fa-network-wired
+        description: Service inventory and port visibility
+        statusCheck: true
+        statusCheckUrl: https://portracker.kigtech.digital
+
+      - title: Dashy
+        url: https://dash.kigtech.digital
+        icon: fas fa-compass
+        description: Home dashboard for the VPS toolchain
+        statusCheck: true
+        statusCheckUrl: https://dash.kigtech.digital
+
+  - name: Reliability
+    icon: fas fa-wave-square
     items:
       - title: Uptime Kuma
         url: ${UPTIME_KUMA_URL}
         icon: fas fa-heartbeat
-        description: Uptime & endpoint monitoring
+        description: External checks, alerting, and service visibility
         statusCheck: true
         statusCheckUrl: ${UPTIME_KUMA_URL}
     widgets:
@@ -44,44 +51,50 @@ sections:
           url: ${UPTIME_KUMA_URL}
           apiKey: ${UPTIME_KUMA_API_KEY}
 
-  - name: Documents & Tools
-    icon: fas fa-tools
+  - name: Documents And Utility
+    icon: fas fa-toolbox
     items:
       - title: Paperless-ngx
         url: https://paperless.kigtech.digital
         icon: fas fa-file-invoice
-        description: Document management system
+        description: Archive, OCR, search, and document workflows
         statusCheck: true
         statusCheckUrl: https://paperless.kigtech.digital
 
       - title: Stirling PDF
         url: https://pdf.kigtech.digital
         icon: fas fa-file-pdf
-        description: Self-hosted PDF toolkit
-        # Stirling returns 401 when login is enabled; that still means it's alive.
-        # Dashy statusCheck may mark 401 as down depending on version; if it annoys you, set statusCheck: false
-        statusCheck: true
+        description: Conversion, merge, split, OCR, and PDF repair
+        statusCheck: false
         statusCheckUrl: https://pdf.kigtech.digital
 
-  - name: Dev Databases
+  - name: Data And Admin
     icon: fas fa-database
     items:
       - title: pgAdmin
         url: https://pg.kigtech.digital
         icon: fas fa-database
-        description: PostgreSQL administration
+        description: Database administration for the dev Postgres stack
         target: newtab
         statusCheck: true
         statusCheckUrl: https://pg.kigtech.digital
 
-  - name: System Info
-    icon: fas fa-info-circle
+      - title: Local Postgres
+        url: https://pg.kigtech.digital
+        icon: fas fa-server
+        description: Backed by the localhost-bound dev Postgres service
+        statusCheck: false
+
+  - name: System Pulse
+    icon: fas fa-chart-line
     widgets:
       - type: clock
         options:
           timezone: ${TZ}
           format: HH:mm:ss
           hideDate: false
+
+      - type: uptime
 
       - type: weather
         options:
@@ -92,16 +105,29 @@ sections:
 
       - type: system-info
 
-  - name: Crypto
-    icon: fab fa-github
-    widgets:
-      - type: crypto-watch-list
-        options:
-          limit: 10
+  - name: Parked Services
+    icon: fas fa-pause-circle
+    items:
+      - title: Immich
+        url: https://dash.kigtech.digital
+        icon: fas fa-camera
+        description: Parked on this VPS for now
+        statusCheck: false
 
-  - title: Portracker
-    url: https://portracker.kigtech.digital
-    icon: fas fa-network-wired
-    description: Port / service visibility & tracking
-    statusCheck: true
-    statusCheckUrl: https://portracker.kigtech.digital
+      - title: Vaultwarden
+        url: https://dash.kigtech.digital
+        icon: fas fa-key
+        description: Not brought online in this current cut
+        statusCheck: false
+
+      - title: FreshRSS
+        url: https://dash.kigtech.digital
+        icon: fas fa-rss
+        description: Installed in repo but intentionally left down
+        statusCheck: false
+
+      - title: Netdata
+        url: https://dash.kigtech.digital
+        icon: fas fa-chart-area
+        description: Excluded from this bring-up
+        statusCheck: false
